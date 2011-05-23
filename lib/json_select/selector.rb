@@ -18,7 +18,16 @@ class JSONSelect::Selector
   
   alias_method :evaluate, :match
   alias_method :=~,       :match
-  alias_method :===,      :match
+  
+  def test(object)
+    _each(@ast, object, nil, nil, nil) do |object|
+      return true
+    end
+    
+    return false
+  end
+  
+  alias_method :===, :test
   
 private
   
