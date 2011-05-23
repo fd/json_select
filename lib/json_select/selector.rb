@@ -16,8 +16,7 @@ class JSONSelect::Selector
     matches
   end
   
-  alias_method :evaluate, :match
-  alias_method :=~,       :match
+  alias_method :=~, :match
   
   def test(object)
     _each(@ast, object, nil, nil, nil) do |object|

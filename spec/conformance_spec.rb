@@ -30,7 +30,14 @@ describe "JSONSelect", "conformance" do
             s = JSONSelect(File.read(selector).strip)
             e = []
             Yajl::Parser.parse(File.read(output)) { |o| e << o }
-            s.evaluate(input).should == e
+            s.match(input).should == e
+          end
+          
+          it "can correctly test the object" do
+            s = JSONSelect(File.read(selector).strip)
+            e = []
+            Yajl::Parser.parse(File.read(output)) { |o| e << o }
+            s.test(input).should be_true
           end
           
         end
