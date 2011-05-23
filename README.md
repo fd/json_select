@@ -23,7 +23,7 @@ gem 'json_select'
 ```ruby
 require 'json_select'
 
-json = { # This would normally be load with something like yajl-ruby
+json = { # This would normally be loaded with something like yajl-ruby
   "name" => {
     "first" => "Lloyd",
     "last" => "Hilaiel"
@@ -48,7 +48,7 @@ json = { # This would normally be load with something like yajl-ruby
   "weight" => 172
 }
 
-JSONSelect('string:first-child') # => ["Lloyd", "Bulgarian", "English", "Spanish", "window", "beer"]
+JSONSelect('string:first-child').match(json) # => ["Lloyd", "Bulgarian", "English", "Spanish", "window", "beer"]
 ```
 
 ## Note on Patches/Pull Requests
