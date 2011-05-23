@@ -52,6 +52,7 @@
     "wine"
 ]
 172
+"somehow YAJL swallows the next object after a number"
 {
     "name": {
         "first": "Lloyd",

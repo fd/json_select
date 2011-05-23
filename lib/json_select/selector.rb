@@ -1,35 +1,35 @@
 class JSONSelect::Selector
-  
+
   attr_reader :ast
-  
+
   def initialize(ast)
     @ast = ast
   end
-  
+
   def match(object)
     matches = []
-    
+
     _each(@ast, object, nil, nil, nil) do |object|
       matches << object
     end
-    
+
     matches
   end
-  
+
   alias_method :=~, :match
-  
+
   def test(object)
     _each(@ast, object, nil, nil, nil) do |object|
       return true
     end
-    
+
     return false
   end
-  
+
   alias_method :===, :test
-  
+
 private
-  
+
   # function forEach(sel, obj, fun, id, num, tot) {
   #   var a = (sel[0] === ',') ? sel.slice(1) : [sel];
   #   var a0 = [];
@@ -59,40 +59,40 @@ private
   def _each(selector, object, id, number, total, &block)
     a0 = (selector[0] == ',' ? selector[1..-1] : [selector])
     a1 = []
-    
+
     call = false
-    
+
     a0.each do |selector|
       ok, extra = _match(object, selector, id, number, total)
-      
+
       call = true if ok
       a1.concat extra
     end
-    
+
     if (Array === object or Hash === object) and a1.any?
       a1.unshift(',')
       size = object.size
-      
+
       if Array === object
         object.each_with_index do |child, idx|
           _each(a1, child, nil, idx, size, &block)
         end
       end
-      
+
       if Hash === object
         object.each_with_index do |(key, child), idx|
           _each(a1, child, key, idx, size, &block)
         end
       end
-      
+
     end
-    
+
     if call and block
       block.call(object)
     end
   end
-  
-  
+
+
   # function mn(node, sel, id, num, tot) {
   #   var sels = [];
   #   var cs = (sel[0] === '>') ? sel[1] : sel[0];
@@ -108,40 +108,40 @@ private
   #       m = (!((num - cs.b) % cs.a) && ((num*cs.a + cs.b) >= 0));
   #     }
   #   }
-  #   
+  #
   #   // should we repeat this selector for descendants?
   #   if (sel[0] !== '>' && sel[0].pc !== ":root") sels.push(sel);
-  #   
+  #
   #   if (m) {
   #     // is there a fragment that we should pass down?
   #     if (sel[0] === '>') { if (sel.length > 2) { m = false; sels.push(sel.slice(2)); } }
   #     else if (sel.length > 1) { m = false; sels.push(sel.slice(1)); }
   #   }
-  #   
+  #
   #   return [m, sels];
   # }
   def _match(object, selector, id, number, total)
     selectors = []
     current_selector = (selector[0] == '>' ? selector[1] : selector[0])
     match = true
-    
+
     if current_selector.key?('type')
       match = (match and current_selector['type'] == _type_of(object))
     end
-    
+
     if current_selector.key?('class')
       match = (match and current_selector['class'] == id)
     end
-    
+
     if match and current_selector.key?('pseudo_function')
       pseudo_function = current_selector['pseudo_function']
-      
+
       if pseudo_function == 'nth-last-child'
         number = total - number
       else
         number += 1
       end
-      
+
       if current_selector['a'] == 0
         match = current_selector['b'] == number
       else
@@ -149,11 +149,11 @@ private
         match = ((((number - current_selector['b']) % current_selector['a']) == 0) && ((number * current_selector['a'] + current_selector['b']) >= 0))
       end
     end
-    
+
     if selector[0] != '>' and selector[0]['pseudo_class'] != 'root'
       selectors.push selector
     end
-    
+
     if match
       if selector[0] == '>'
         if selector.length > 2
@@ -165,10 +165,10 @@ private
         selectors.push selector[1..-1]
       end
     end
-    
+
     return [match, selectors]
   end
-  
+
   def _type_of(object)
     case object
     when Hash       then 'object'
@@ -180,5 +180,5 @@ private
     when NilClass   then 'null'
     end
   end
-  
+
 end
