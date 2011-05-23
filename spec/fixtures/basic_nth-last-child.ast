@@ -1,0 +1,6 @@
+[ { "type"            : "string"
+  , "pseudo_function" : "nth-last-child"
+  , "a"               : 0
+  , "b"               : 1
+  }
+]

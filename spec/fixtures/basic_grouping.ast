@@ -1,0 +1,12 @@
+[ ","
+
+, [ { "type"  : "string"
+    , "class" : "level"
+    }
+  ]
+
+, [ { "type"  : "number"
+    }
+  ]
+  
+]

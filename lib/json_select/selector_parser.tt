@@ -1,0 +1,161 @@
+module JSONSelect
+grammar SelectorParser
+
+  # selectors_group
+  #   : selector [ `,` selector ]*
+  #   ;
+  rule selectors_group
+    a:selector b:( ',' c:selector )* <JSONSelect::Ast::SelectorGroup>
+  end
+
+  # selector
+  #   : simple_selector_sequence [ combinator simple_selector_sequence ]*
+  #   ;
+  rule selector
+    a:simple_selector_sequence b:( c:combinator d:simple_selector_sequence )* <JSONSelect::Ast::CombinationSelector>
+  end
+
+  # combinator
+  #   : `>` | \s+
+  #   ;
+  rule combinator
+    '>' / [\s]+
+  end
+
+  # simple_selector_sequence
+  #   /* why allow multiple HASH entities in the grammar? */
+  #   : [ type_selector | universal ]
+  #     [ hash | pseudo ]*
+  #   | [ hash | pseudo ]+
+  #   ;
+  rule simple_selector_sequence
+    ( a:( type_selector / universal ) b:( hash / pseudo )* <JSONSelect::Ast::SimpleSelector> )
+    /
+    ( ( hash / pseudo )+ <JSONSelect::Ast::SimpleSelector> )
+  end
+
+  # type_selector
+  #   : `object` | `array` | `number` | `string` | `boolean` | `null`
+  #   ;
+  rule type_selector
+    ('object' / 'array' / 'number' / 'string' / 'boolean' / 'null') <JSONSelect::Ast::TypeSelector>
+  end
+  
+  # universal
+  #   : '*'
+  #   ;
+  rule universal
+    '*' <JSONSelect::Ast::UniversalSelector>
+  end
+  
+  # hash
+  #   : `.` name
+  #   | `.` json_string
+  #   ;
+  rule hash
+    ( ( '.' name ) / ( '.' json_string ) ) <JSONSelect::Ast::HashSelector>
+  end
+
+  # pseudo
+  #   /* Note that pseudo-elements are restricted to one per selector and */
+  #   /* occur only in the last simple_selector_sequence. */
+  #   : `:` pseudo_class_name
+  #   | `:` pseudo_function_name `(` expression `)`
+  #   ;
+  rule pseudo
+    ( ':' a:pseudo_class_name <JSONSelect::Ast::PseudoSelector> ) / 
+    ( ':' a:pseudo_function_name '(' e:expression ')' <JSONSelect::Ast::PseudoSelector> )
+  end
+
+  # pseudo_class_name
+  #   : `root` | `first-child` | `last-child` | `only-child`
+  rule pseudo_class_name
+    'root' / 'first-child' / 'last-child' / 'only-child'
+  end
+  
+  # pseudo_function_name
+  #   : `nth-child` | `nth-last-child`
+  rule pseudo_function_name
+    'nth-child' / 'nth-last-child'
+  end
+
+  # expression
+  #   /* expression is and of the form "an+b" */
+  #   : TODO
+  #   ;
+  # /^ \(
+  #   (?: ([+-]?) ([0-9]*) n (?:([+-]) ([0-9]) )?
+  #   | (odd|even)
+  #   | ( [+-]? [0-9]+ )
+  #   )
+  #    \) /;
+  rule expression
+    ('odd'  <JSONSelect::Ast::OddExpr> ) /
+    ('even' <JSONSelect::Ast::EvenExpr>) /
+    ( a:[+-]? b:[0-9]* 'n' c:( [+-] [0-9] )? <JSONSelect::Ast::ComplexExpr> ) /
+    ( [+-]? [0-9]+ <JSONSelect::Ast::SimpleExpr> )
+  end
+  
+  # json_string
+  #   : `"` json_chars* `"`
+  #   ;
+  rule json_string
+    ["] json_chars* ["]
+  end
+  
+  # json_chars
+  #   : any-Unicode-character-except-"-or-\-or-control-character
+  #   |  `\"`
+  #   |  `\\`
+  #   |  `\/`
+  #   |  `\b`
+  #   |  `\f`
+  #   |  `\n`
+  #   |  `\r`
+  #   |  `\t`
+  #   |   \u four-hex-digits 
+  #   ;
+  rule json_chars
+    [^\\"] /
+    ( [\\] ["\\/bfnrt] )
+  end
+  
+  # name
+  #   : nmstart nmchar*
+  #   ;
+  rule name
+    nmstart nmchar*
+  end
+  
+  # nmstart
+  #   : escape | [_a-zA-Z] | nonascii
+  #   ;
+  rule nmstart
+    escape / [_a-zA-Z] / nonascii
+  end
+  
+  # nmchar
+  #   : [_a-zA-Z0-9-]
+  #   | escape
+  #   | nonascii
+  #   ;
+  rule nmchar
+    [_a-zA-Z0-9-] / escape / nonascii
+  end
+
+  # escape 
+  #   : \\[^\r\n\f0-9a-fA-F]
+  #   ;
+  rule escape
+    [\\] [^\r\n\f0-9a-fA-F]
+  end
+  
+  # nonascii
+  #   : [^\0-0177]
+  #   ;
+  rule nonascii
+    [^\0-0177]
+  end
+
+end
+end

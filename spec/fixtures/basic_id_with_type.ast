@@ -1,0 +1,4 @@
+[ { "class" : "favoriteColor"
+  , "type"  : "string"
+  }
+]

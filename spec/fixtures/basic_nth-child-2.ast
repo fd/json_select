@@ -1,0 +1,6 @@
+[ { "type"            : "string"
+  , "pseudo_function" : "nth-child"
+  , "a"               : -1
+  , "b"               : 2
+  }
+]
