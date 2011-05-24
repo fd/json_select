@@ -1,5 +1,4 @@
-module JSONSelect
-grammar SelectorParser
+grammar JSONSelectSelector
 
   # selectors_group
   #   : selector [ `,` selector ]*
@@ -40,14 +39,14 @@ grammar SelectorParser
   rule type_selector
     ('object' / 'array' / 'number' / 'string' / 'boolean' / 'null') <JSONSelect::Ast::TypeSelector>
   end
-  
+
   # universal
   #   : '*'
   #   ;
   rule universal
     '*' <JSONSelect::Ast::UniversalSelector>
   end
-  
+
   # hash
   #   : `.` name
   #   | `.` json_string
@@ -63,7 +62,7 @@ grammar SelectorParser
   #   | `:` pseudo_function_name `(` expression `)`
   #   ;
   rule pseudo
-    ( ':' a:pseudo_class_name <JSONSelect::Ast::PseudoSelector> ) / 
+    ( ':' a:pseudo_class_name <JSONSelect::Ast::PseudoSelector> ) /
     ( ':' a:pseudo_function_name '(' e:expression ')' <JSONSelect::Ast::PseudoSelector> )
   end
 
@@ -72,7 +71,7 @@ grammar SelectorParser
   rule pseudo_class_name
     'root' / 'first-child' / 'last-child' / 'only-child'
   end
-  
+
   # pseudo_function_name
   #   : `nth-child` | `nth-last-child`
   rule pseudo_function_name
@@ -95,14 +94,14 @@ grammar SelectorParser
     ( a:[+-]? b:[0-9]* 'n' c:( [+-] [0-9] )? <JSONSelect::Ast::ComplexExpr> ) /
     ( [+-]? [0-9]+ <JSONSelect::Ast::SimpleExpr> )
   end
-  
+
   # json_string
   #   : `"` json_chars* `"`
   #   ;
   rule json_string
     ["] json_chars* ["]
   end
-  
+
   # json_chars
   #   : any-Unicode-character-except-"-or-\-or-control-character
   #   |  `\"`
@@ -113,27 +112,27 @@ grammar SelectorParser
   #   |  `\n`
   #   |  `\r`
   #   |  `\t`
-  #   |   \u four-hex-digits 
+  #   |   \u four-hex-digits
   #   ;
   rule json_chars
     [^\\"] /
     ( [\\] ["\\/bfnrt] )
   end
-  
+
   # name
   #   : nmstart nmchar*
   #   ;
   rule name
     nmstart nmchar*
   end
-  
+
   # nmstart
   #   : escape | [_a-zA-Z] | nonascii
   #   ;
   rule nmstart
     escape / [_a-zA-Z] / nonascii
   end
-  
+
   # nmchar
   #   : [_a-zA-Z0-9-]
   #   | escape
@@ -143,13 +142,13 @@ grammar SelectorParser
     [_a-zA-Z0-9-] / escape / nonascii
   end
 
-  # escape 
+  # escape
   #   : \\[^\r\n\f0-9a-fA-F]
   #   ;
   rule escape
     [\\] [^\r\n\f0-9a-fA-F]
   end
-  
+
   # nonascii
   #   : [^\0-0177]
   #   ;
@@ -157,5 +156,4 @@ grammar SelectorParser
     [^\0-0177]
   end
 
-end
 end

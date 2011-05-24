@@ -1,12 +1,62 @@
-class JSONSelect::Selector
+class JSONSelect
 
   attr_reader :ast
 
-  def initialize(ast)
-    @ast = ast
+  @@parser_cache = {}
+
+  def self.reset_cache!
+    @@parser_cache.clear
   end
 
+  def initialize(src, use_parser_cache=true)
+    case src
+
+    when String
+      ast = nil
+
+      if use_parser_cache
+        ast = @@parser_cache[src]
+      end
+
+      if ast
+        @ast = ast
+
+      else
+        parser = JSONSelect::SelectorParser.new
+        tree   = parser.parse(src)
+        unless tree
+          raise JSONSelect::ParseError, @parser.failure_reason
+        end
+
+        @ast = tree.to_ast
+
+        if use_parser_cache
+          @@parser_cache[src] = ast
+        end
+      end
+
+    when Array
+      @ast = src
+
+    else
+      raise ArgumentError, "Expected a string for ast"
+
+    end
+  end
+
+  # Returns the first matching child in `object`
   def match(object)
+    _each(@ast, object, nil, nil, nil) do |object|
+      return object
+    end
+
+    return nil
+  end
+
+  alias_method :=~, :match
+
+  # Returns all matching children in `object`
+  def matches(object)
     matches = []
 
     _each(@ast, object, nil, nil, nil) do |object|
@@ -16,8 +66,7 @@ class JSONSelect::Selector
     matches
   end
 
-  alias_method :=~, :match
-
+  # Returns true if `object` has any matching children.
   def test(object)
     _each(@ast, object, nil, nil, nil) do |object|
       return true
@@ -69,22 +118,26 @@ private
       a1.concat extra
     end
 
-    if (Array === object or Hash === object) and a1.any?
-      a1.unshift(',')
-      size = object.size
+    if a1.any?
+      case object
 
-      if Array === object
+      when Array
+        a1.unshift(',')
+        size = object.size
+
         object.each_with_index do |child, idx|
           _each(a1, child, nil, idx, size, &block)
         end
-      end
 
-      if Hash === object
+      when Hash
+        a1.unshift(',')
+        size = object.size
+
         object.each_with_index do |(key, child), idx|
           _each(a1, child, key, idx, size, &block)
         end
-      end
 
+      end
     end
 
     if call and block
@@ -122,19 +175,19 @@ private
   # }
   def _match(object, selector, id, number, total)
     selectors = []
-    current_selector = (selector[0] == '>' ? selector[1] : selector[0])
+    current_selector = (selector[0] == :> ? selector[1] : selector[0])
     match = true
 
-    if current_selector.key?('type')
-      match = (match and current_selector['type'] == _type_of(object))
+    if current_selector.key?(:type)
+      match = (match and current_selector[:type] == _type_of(object))
     end
 
-    if current_selector.key?('class')
-      match = (match and current_selector['class'] == id)
+    if current_selector.key?(:class)
+      match = (match and current_selector[:class] == id)
     end
 
-    if match and current_selector.key?('pseudo_function')
-      pseudo_function = current_selector['pseudo_function']
+    if match and current_selector.key?(:pseudo_function)
+      pseudo_function = current_selector[:pseudo_function]
 
       if pseudo_function == 'nth-last-child'
         number = total - number
@@ -142,20 +195,20 @@ private
         number += 1
       end
 
-      if current_selector['a'] == 0
-        match = current_selector['b'] == number
+      if current_selector[:a] == 0
+        match = current_selector[:b] == number
       else
         # WTF!
-        match = ((((number - current_selector['b']) % current_selector['a']) == 0) && ((number * current_selector['a'] + current_selector['b']) >= 0))
+        match = ((((number - current_selector[:b]) % current_selector[:a]) == 0) && ((number * current_selector[:a] + current_selector[:b]) >= 0))
       end
     end
 
-    if selector[0] != '>' and selector[0]['pseudo_class'] != 'root'
+    if selector[0] != :> and selector[0][:pseudo_class] != 'root'
       selectors.push selector
     end
 
     if match
-      if selector[0] == '>'
+      if selector[0] == :>
         if selector.length > 2
           m = false
           selectors.push selector[2..-1]
@@ -174,10 +227,12 @@ private
     when Hash       then 'object'
     when Array      then 'array'
     when String     then 'string'
+    when Symbol     then 'string'
     when Numeric    then 'number'
     when TrueClass  then 'boolean'
     when FalseClass then 'boolean'
     when NilClass   then 'null'
+    else raise "Invalid object of class #{object.class} for JSONSelect: #{object.inspect}"
     end
   end
 

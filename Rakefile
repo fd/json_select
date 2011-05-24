@@ -11,6 +11,11 @@ end
 
 task :build_parser do
   sh "bundle exec tt lib/json_select/selector_parser.tt -o lib/json_select/selector_parser.rb"
+
+  path = 'lib/json_select/selector_parser.rb'
+  src = File.read(path)
+  src.gsub!('JSONSelectSelector', 'JSONSelect::Selector')
+  File.open(path, 'w+') { |f| f.write src }
 end
 
 task :spec    => :build_parser

@@ -20,9 +20,9 @@ describe "JSONSelect", "conformance" do
         describe "(#{name})" do
 
           it "parses the selector" do
-            ast = Yajl::Parser.parse(File.read(ast))
+            ast = Yajl::Parser.parse(File.read(ast), :symbolize_keys => true)
             s = JSONSelect(File.read(selector).strip)
-            s.should be_a(JSONSelect::Selector)
+            s.should be_a(JSONSelect)
             s.ast.should == ast
           end
 
@@ -30,7 +30,14 @@ describe "JSONSelect", "conformance" do
             s = JSONSelect(File.read(selector).strip)
             e = []
             Yajl::Parser.parse(File.read(output)) { |o| e << o }
-            s.match(input).should == e
+            s.matches(input).should == e
+          end
+
+          it "finds the first matching child" do
+            s = JSONSelect(File.read(selector).strip)
+            e = []
+            Yajl::Parser.parse(File.read(output)) { |o| e << o }
+            s.match(input).should == e.first
           end
 
           it "can correctly test the object" do
