@@ -183,7 +183,7 @@ private
     end
 
     if current_selector.key?(:class)
-      match = (match and current_selector[:class] == id)
+      match = (match and current_selector[:class] == id.to_s)
     end
 
     if match and current_selector.key?(:pseudo_function)
@@ -196,25 +196,25 @@ private
       end
 
       if current_selector[:a] == 0
-        match = current_selector[:b] == number
+        match = (current_selector[:b] == number)
       else
         # WTF!
         match = ((((number - current_selector[:b]) % current_selector[:a]) == 0) && ((number * current_selector[:a] + current_selector[:b]) >= 0))
       end
     end
 
-    if selector[0] != :> and selector[0][:pseudo_class] != 'root'
+    if Hash === selector[0] and selector[0][:pseudo_class] != 'root'
       selectors.push selector
     end
 
     if match
       if selector[0] == :>
-        if selector.length > 2
-          m = false
+        if selector.length > 2 
+          match = false
           selectors.push selector[2..-1]
         end
       elsif selector.length > 1
-        m = false
+        match = false
         selectors.push selector[1..-1]
       end
     end
