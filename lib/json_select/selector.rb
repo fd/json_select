@@ -195,7 +195,7 @@ private
     has_root_test = false
 
     current_selector[:tests].each do |test|
-      if test[:f] == "is_root"
+      if test[:f] == :is_root
         has_root_test = true
       end
       
@@ -259,8 +259,8 @@ private
   
   def empty(object, test, key, idx, size, depth)
     case object
-    when Array then object.empty?
-    when Hash  then object.empty?
+    when Array then return object.empty?
+    when Hash  then return object.empty?
     else
       if object.respond_to?(:json_select_each)
         object.json_select_each { return false }
@@ -283,6 +283,8 @@ private
   end
   
   def nth_child(object, test, key, idx, size, depth)
+    return false unless idx
+    
     idx += 1
     
     a = test[:a]

@@ -794,8 +794,19 @@ module JSONSelect::Selector
           if r4
             r0 = r4
           else
-            @index = i0
-            r0 = nil
+            if has_terminal?('empty', false, index)
+              r5 = instantiate_node(SyntaxNode,input, index...(index + 5))
+              @index += 5
+            else
+              terminal_parse_failure('empty')
+              r5 = nil
+            end
+            if r5
+              r0 = r5
+            else
+              @index = i0
+              r0 = nil
+            end
           end
         end
       end

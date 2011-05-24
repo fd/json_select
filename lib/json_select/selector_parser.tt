@@ -69,7 +69,7 @@ grammar JSONSelectSelector
   # pseudo_class_name
   #   : `root` | `first-child` | `last-child` | `only-child`
   rule pseudo_class_name
-    'root' / 'first-child' / 'last-child' / 'only-child'
+    'root' / 'first-child' / 'last-child' / 'only-child' / 'empty'
   end
 
   # pseudo_function_name
