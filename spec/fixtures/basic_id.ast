@@ -1,3 +1,7 @@
-[ { "class" : "favoriteColor"
+[ { "tests" :
+    [ { "f" : "has_class"
+      , "n" : "favoriteColor"
+      }
+    ]
   }
 ]

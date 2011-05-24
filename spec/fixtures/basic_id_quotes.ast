@@ -1,3 +1,7 @@
-[ { "class" : "weight"
+[ { "tests" :
+    [ { "f" : "has_class"
+      , "n" : "weight"
+      }
+    ]
   }
 ]

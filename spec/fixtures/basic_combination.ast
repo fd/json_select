@@ -1,5 +1,13 @@
-[ { "class" : "name"
+[ { "tests" :
+    [ { "f" : "has_class"
+      , "n" : "name"
+      }
+    ]
   }
-, { "class" : "first"
+, { "tests" :
+    [ { "f" : "has_class"
+      , "n" : "first"
+      }
+    ]
   }
 ]

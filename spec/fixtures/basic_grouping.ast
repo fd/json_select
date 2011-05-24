@@ -1,12 +1,22 @@
 [ ","
 
-, [ { "type"  : "string"
-    , "class" : "level"
-    }
-  ]
-
-, [ { "type"  : "number"
+, [ { "tests" :
+      [ { "f" : "instance_of_type"
+        , "n" : "string"
+        }
+      , { "f" : "has_class"
+        , "n" : "level"
+        }
+      ]
     }
   ]
   
+, [ { "tests" :
+      [ { "f" : "instance_of_type"
+        , "n" : "number"
+        }
+      ]
+    }
+  ]
+
 ]

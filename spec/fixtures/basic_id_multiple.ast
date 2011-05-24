@@ -1,3 +1,7 @@
-[ { "class" : "language"
+[ { "tests" :
+    [ { "f" : "has_class"
+      , "n" : "language"
+      }
+    ]
   }
 ]

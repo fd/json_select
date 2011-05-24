@@ -1,6 +1,11 @@
-[ { "type"            : "string"
-  , "pseudo_function" : "nth-child"
-  , "a"               : -1
-  , "b"               : 2
+[ { "tests" :
+    [ { "f" : "instance_of_type"
+      , "n" : "string"
+      }
+    , { "f" : "nth_child"
+      , "a" : -1
+      , "b" : 2
+      }
+    ]
   }
 ]

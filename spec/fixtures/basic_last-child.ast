@@ -1,6 +1,11 @@
-[ { "type"            : "string"
-  , "pseudo_function" : "nth-last-child"
-  , "a" : 0
-  , "b" : 1
+[ { "tests" :
+    [ { "f" : "instance_of_type"
+      , "n" : "string"
+      }
+    , { "f" : "nth_last_child"
+      , "a" : 0
+      , "b" : 1
+      }
+    ]
   }
 ]

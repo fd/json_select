@@ -1,3 +1,7 @@
-[ { "type" : "object"
+[ { "tests" :
+    [ { "f" : "instance_of_type"
+      , "n" : "object"
+      }
+    ]
   }
 ]

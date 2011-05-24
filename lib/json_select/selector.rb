@@ -46,7 +46,7 @@ class JSONSelect
 
   # Returns the first matching child in `object`
   def match(object)
-    _each(@ast, object, nil, nil, nil) do |object|
+    _each(@ast, object, nil, nil, nil, 0) do |object|
       return object
     end
 
@@ -59,7 +59,7 @@ class JSONSelect
   def matches(object)
     matches = []
 
-    _each(@ast, object, nil, nil, nil) do |object|
+    _each(@ast, object, nil, nil, nil, 0) do |object|
       matches << object
     end
 
@@ -68,7 +68,7 @@ class JSONSelect
 
   # Returns true if `object` has any matching children.
   def test(object)
-    _each(@ast, object, nil, nil, nil) do |object|
+    _each(@ast, object, nil, nil, nil, 0) do |object|
       return true
     end
 
@@ -105,14 +105,14 @@ private
   #   }
   #   if (call && fun) fun(obj);
   # };
-  def _each(selector, object, id, number, total, &block)
+  def _each(selector, object, id, number, total, depth, &block)
     a0 = (selector[0] == ',' ? selector[1..-1] : [selector])
     a1 = []
 
     call = false
 
     a0.each do |selector|
-      ok, extra = _match(object, selector, id, number, total)
+      ok, extra = _match(object, selector, id, number, total, depth)
 
       call = true if ok
       a1.concat extra
@@ -126,7 +126,7 @@ private
         size = object.size
 
         object.each_with_index do |child, idx|
-          _each(a1, child, nil, idx, size, &block)
+          _each(a1, child, nil, idx, size, depth + 1, &block)
         end
 
       when Hash
@@ -134,7 +134,7 @@ private
         size = object.size
 
         object.each_with_index do |(key, child), idx|
-          _each(a1, child, key, idx, size, &block)
+          _each(a1, child, key, idx, size, depth + 1, &block)
         end
 
       else
@@ -148,7 +148,7 @@ private
           size = children.size
           
           children.each_with_index do |(key, child), idx|
-            _each(a1, child, key, idx, size, &block)
+            _each(a1, child, key, idx, size, depth + 1, &block)
           end
         end
 
@@ -188,56 +188,54 @@ private
   #
   #   return [m, sels];
   # }
-  def _match(object, selector, id, number, total)
+  def _match(object, selector, id, number, total, depth)
     selectors = []
     current_selector = (selector[0] == :> ? selector[1] : selector[0])
     match = true
+    has_root_test = false
 
-    if current_selector.key?(:type)
-      match = (match and current_selector[:type] == _type_of(object))
-    end
-
-    if current_selector.key?(:class)
-      match = (match and current_selector[:class] == id.to_s)
-    end
-
-    if match and current_selector.key?(:pseudo_function)
-      pseudo_function = current_selector[:pseudo_function]
-
-      if pseudo_function == 'nth-last-child'
-        number = total - number
-      else
-        number += 1
+    current_selector[:tests].each do |test|
+      if test[:f] == "is_root"
+        has_root_test = true
       end
-
-      if current_selector[:a] == 0
-        match = (current_selector[:b] == number)
-      else
-        # WTF!
-        match = ((((number - current_selector[:b]) % current_selector[:a]) == 0) && ((number * current_selector[:a] + current_selector[:b]) >= 0))
+      
+      if match
+        match = !!send(test[:f], object, test, id, number, total, depth)
       end
     end
 
-    if Hash === selector[0] and selector[0][:pseudo_class] != 'root'
+    # continue search for decendants
+    if Hash === selector[0] and !has_root_test
       selectors.push selector
     end
 
-    if match
-      if selector[0] == :>
-        if selector.length > 2 
-          match = false
-          selectors.push selector[2..-1]
-        end
-      elsif selector.length > 1
-        match = false
-        selectors.push selector[1..-1]
-      end
+    # break search for terminals
+    if selector.size <= 1
+      return [match, selectors]
+    end
+
+    # break search (no match)
+    unless match
+      return [match, selectors]
+    end
+    
+    # continue search for decendants
+    unless selector[0] == :>
+      match = false
+      selectors.push selector[1..-1]
+      return [match, selectors]
+    end
+    
+    # continue search for children
+    if selector.length > 2 
+      match = false
+      selectors.push selector[2..-1]
     end
 
     return [match, selectors]
   end
 
-  def _type_of(object)
+  def type_of(object)
     if object.respond_to?(:json_select_each)
       return 'object'
     end
@@ -253,6 +251,52 @@ private
     when NilClass   then 'null'
     else raise "Invalid object of class #{object.class} for JSONSelect: #{object.inspect}"
     end
+  end
+  
+  def only_child(object, test, key, idx, size, depth)
+    size == 1
+  end
+  
+  def empty(object, test, key, idx, size, depth)
+    case object
+    when Array then object.empty?
+    when Hash  then object.empty?
+    else
+      if object.respond_to?(:json_select_each)
+        object.json_select_each { return false }
+        return true
+      end
+    end
+    return false
+  end
+  
+  def is_root(object, test, key, idx, size, depth)
+    depth == 0
+  end
+  
+  def instance_of_type(object, test, key, idx, size, depth)
+    test[:n] == type_of(object)
+  end
+  
+  def has_class(object, test, key, idx, size, depth)
+    test[:n] == key.to_s
+  end
+  
+  def nth_child(object, test, key, idx, size, depth)
+    idx += 1
+    
+    a = test[:a]
+    b = test[:b]
+    
+    if a == 0
+      (b == idx)
+    else
+      (((idx - b) % a) == 0) and ((idx * a + b) >= 0)
+    end
+  end
+  
+  def nth_last_child(object, test, key, idx, size, depth)
+    nth_child(object, test, key, (size - idx) - 1, size, depth)
   end
 
 end

@@ -1,3 +1,6 @@
-[ { "pseudo_class" : "root"
+[ { "tests" :
+    [ { "f" : "is_root"
+      }
+    ]
   }
 ]
