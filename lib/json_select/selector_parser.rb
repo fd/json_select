@@ -619,7 +619,7 @@ module JSONSelect::Selector
     end
 
     def e
-      elements[3]
+      elements[4]
     end
 
   end
@@ -681,17 +681,43 @@ module JSONSelect::Selector
           end
           s4 << r7
           if r7
-            r8 = _nt_expression
+            s8, i8 = [], index
+            loop do
+              r9 = _nt_ws
+              if r9
+                s8 << r9
+              else
+                break
+              end
+            end
+            r8 = instantiate_node(SyntaxNode,input, i8...index, s8)
             s4 << r8
             if r8
-              if has_terminal?(')', false, index)
-                r9 = instantiate_node(SyntaxNode,input, index...(index + 1))
-                @index += 1
-              else
-                terminal_parse_failure(')')
-                r9 = nil
+              r10 = _nt_expression
+              s4 << r10
+              if r10
+                s11, i11 = [], index
+                loop do
+                  r12 = _nt_ws
+                  if r12
+                    s11 << r12
+                  else
+                    break
+                  end
+                end
+                r11 = instantiate_node(SyntaxNode,input, i11...index, s11)
+                s4 << r11
+                if r11
+                  if has_terminal?(')', false, index)
+                    r13 = instantiate_node(SyntaxNode,input, index...(index + 1))
+                    @index += 1
+                  else
+                    terminal_parse_failure(')')
+                    r13 = nil
+                  end
+                  s4 << r13
+                end
               end
-              s4 << r9
             end
           end
         end
@@ -835,7 +861,7 @@ module JSONSelect::Selector
     end
 
     def c
-      elements[3]
+      elements[4]
     end
   end
 
@@ -914,36 +940,62 @@ module JSONSelect::Selector
             end
             s3 << r8
             if r8
-              i10, s10 = index, []
-              if has_terminal?('\G[+-]', true, index)
-                r11 = true
-                @index += 1
-              else
-                r11 = nil
+              s9, i9 = [], index
+              loop do
+                r10 = _nt_ws
+                if r10
+                  s9 << r10
+                else
+                  break
+                end
               end
-              s10 << r11
-              if r11
-                if has_terminal?('\G[0-9]', true, index)
-                  r12 = true
+              r9 = instantiate_node(SyntaxNode,input, i9...index, s9)
+              s3 << r9
+              if r9
+                i12, s12 = index, []
+                if has_terminal?('\G[+-]', true, index)
+                  r13 = true
                   @index += 1
                 else
+                  r13 = nil
+                end
+                s12 << r13
+                if r13
+                  s14, i14 = [], index
+                  loop do
+                    r15 = _nt_ws
+                    if r15
+                      s14 << r15
+                    else
+                      break
+                    end
+                  end
+                  r14 = instantiate_node(SyntaxNode,input, i14...index, s14)
+                  s12 << r14
+                  if r14
+                    if has_terminal?('\G[0-9]', true, index)
+                      r16 = true
+                      @index += 1
+                    else
+                      r16 = nil
+                    end
+                    s12 << r16
+                  end
+                end
+                if s12.last
+                  r12 = instantiate_node(SyntaxNode,input, i12...index, s12)
+                  r12.extend(Expression0)
+                else
+                  @index = i12
                   r12 = nil
                 end
-                s10 << r12
+                if r12
+                  r11 = r12
+                else
+                  r11 = instantiate_node(SyntaxNode,input, index...index)
+                end
+                s3 << r11
               end
-              if s10.last
-                r10 = instantiate_node(SyntaxNode,input, i10...index, s10)
-                r10.extend(Expression0)
-              else
-                @index = i10
-                r10 = nil
-              end
-              if r10
-                r9 = r10
-              else
-                r9 = instantiate_node(SyntaxNode,input, index...index)
-              end
-              s3 << r9
             end
           end
         end
@@ -957,51 +1009,51 @@ module JSONSelect::Selector
         if r3
           r0 = r3
         else
-          i13, s13 = index, []
+          i17, s17 = index, []
           if has_terminal?('\G[+-]', true, index)
-            r15 = true
+            r19 = true
             @index += 1
           else
-            r15 = nil
+            r19 = nil
           end
-          if r15
-            r14 = r15
+          if r19
+            r18 = r19
           else
-            r14 = instantiate_node(SyntaxNode,input, index...index)
+            r18 = instantiate_node(SyntaxNode,input, index...index)
           end
-          s13 << r14
-          if r14
-            s16, i16 = [], index
+          s17 << r18
+          if r18
+            s20, i20 = [], index
             loop do
               if has_terminal?('\G[0-9]', true, index)
-                r17 = true
+                r21 = true
                 @index += 1
               else
-                r17 = nil
+                r21 = nil
               end
-              if r17
-                s16 << r17
+              if r21
+                s20 << r21
               else
                 break
               end
             end
-            if s16.empty?
-              @index = i16
-              r16 = nil
+            if s20.empty?
+              @index = i20
+              r20 = nil
             else
-              r16 = instantiate_node(SyntaxNode,input, i16...index, s16)
+              r20 = instantiate_node(SyntaxNode,input, i20...index, s20)
             end
-            s13 << r16
+            s17 << r20
           end
-          if s13.last
-            r13 = instantiate_node(JSONSelect::Ast::SimpleExpr,input, i13...index, s13)
-            r13.extend(Expression2)
+          if s17.last
+            r17 = instantiate_node(JSONSelect::Ast::SimpleExpr,input, i17...index, s17)
+            r17.extend(Expression2)
           else
-            @index = i13
-            r13 = nil
+            @index = i17
+            r17 = nil
           end
-          if r13
-            r0 = r13
+          if r17
+            r0 = r17
           else
             @index = i0
             r0 = nil

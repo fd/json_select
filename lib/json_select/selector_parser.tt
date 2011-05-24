@@ -63,7 +63,7 @@ grammar JSONSelectSelector
   #   ;
   rule pseudo
     ( ':' a:pseudo_class_name <JSONSelect::Ast::PseudoSelector> ) /
-    ( ':' a:pseudo_function_name '(' e:expression ')' <JSONSelect::Ast::PseudoSelector> )
+    ( ':' a:pseudo_function_name '(' ws* e:expression ws* ')' <JSONSelect::Ast::PseudoSelector> )
   end
 
   # pseudo_class_name
@@ -82,16 +82,10 @@ grammar JSONSelectSelector
   #   /* expression is and of the form "an+b" */
   #   : TODO
   #   ;
-  # /^ \(
-  #   (?: ([+-]?) ([0-9]*) n (?:([+-]) ([0-9]) )?
-  #   | (odd|even)
-  #   | ( [+-]? [0-9]+ )
-  #   )
-  #    \) /;
   rule expression
     ('odd'  <JSONSelect::Ast::OddExpr> ) /
     ('even' <JSONSelect::Ast::EvenExpr>) /
-    ( a:[+-]? b:[0-9]* 'n' c:( [+-] [0-9] )? <JSONSelect::Ast::ComplexExpr> ) /
+    ( a:[+-]? b:[0-9]* 'n' ws* c:( [+-] ws* [0-9] )? <JSONSelect::Ast::ComplexExpr> ) /
     ( [+-]? [0-9]+ <JSONSelect::Ast::SimpleExpr> )
   end
 
