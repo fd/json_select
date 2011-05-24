@@ -137,6 +137,21 @@ private
           _each(a1, child, key, idx, size, &block)
         end
 
+      else
+        if object.respond_to?(:json_select_each)
+          children = []
+          object.json_select_each do |key, value|
+            children << [key, value]
+          end
+          
+          a1.unshift(',')
+          size = children.size
+          
+          children.each_with_index do |(key, child), idx|
+            _each(a1, child, key, idx, size, &block)
+          end
+        end
+
       end
     end
 
@@ -223,6 +238,10 @@ private
   end
 
   def _type_of(object)
+    if object.respond_to?(:json_select_each)
+      return 'object'
+    end
+    
     case object
     when Hash       then 'object'
     when Array      then 'array'
