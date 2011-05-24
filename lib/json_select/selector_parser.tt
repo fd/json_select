@@ -4,7 +4,7 @@ grammar JSONSelectSelector
   #   : selector [ `,` selector ]*
   #   ;
   rule selectors_group
-    a:selector b:( ',' c:selector )* <JSONSelect::Ast::SelectorGroup>
+    ws* a:selector b:( ws* ',' ws* c:selector )* ws* <JSONSelect::Ast::SelectorGroup>
   end
 
   # selector
@@ -18,7 +18,7 @@ grammar JSONSelectSelector
   #   : `>` | \s+
   #   ;
   rule combinator
-    '>' / [\s]+
+    (ws* '>' ws* ) / (ws+)
   end
 
   # simple_selector_sequence
@@ -154,6 +154,10 @@ grammar JSONSelectSelector
   #   ;
   rule nonascii
     [^\0-0177]
+  end
+
+  rule ws
+    [ \t\r\n]
   end
 
 end

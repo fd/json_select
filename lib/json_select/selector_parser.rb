@@ -10,18 +10,19 @@ module JSONSelect::Selector
 
   module SelectorsGroup0
     def c
-      elements[1]
+      elements[3]
     end
   end
 
   module SelectorsGroup1
     def a
-      elements[0]
+      elements[1]
     end
 
     def b
-      elements[1]
+      elements[2]
     end
+
   end
 
   def _nt_selectors_group
@@ -36,39 +37,91 @@ module JSONSelect::Selector
     end
 
     i0, s0 = index, []
-    r1 = _nt_selector
+    s1, i1 = [], index
+    loop do
+      r2 = _nt_ws
+      if r2
+        s1 << r2
+      else
+        break
+      end
+    end
+    r1 = instantiate_node(SyntaxNode,input, i1...index, s1)
     s0 << r1
     if r1
-      s2, i2 = [], index
-      loop do
-        i3, s3 = index, []
-        if has_terminal?(',', false, index)
-          r4 = instantiate_node(SyntaxNode,input, index...(index + 1))
-          @index += 1
-        else
-          terminal_parse_failure(',')
-          r4 = nil
+      r3 = _nt_selector
+      s0 << r3
+      if r3
+        s4, i4 = [], index
+        loop do
+          i5, s5 = index, []
+          s6, i6 = [], index
+          loop do
+            r7 = _nt_ws
+            if r7
+              s6 << r7
+            else
+              break
+            end
+          end
+          r6 = instantiate_node(SyntaxNode,input, i6...index, s6)
+          s5 << r6
+          if r6
+            if has_terminal?(',', false, index)
+              r8 = instantiate_node(SyntaxNode,input, index...(index + 1))
+              @index += 1
+            else
+              terminal_parse_failure(',')
+              r8 = nil
+            end
+            s5 << r8
+            if r8
+              s9, i9 = [], index
+              loop do
+                r10 = _nt_ws
+                if r10
+                  s9 << r10
+                else
+                  break
+                end
+              end
+              r9 = instantiate_node(SyntaxNode,input, i9...index, s9)
+              s5 << r9
+              if r9
+                r11 = _nt_selector
+                s5 << r11
+              end
+            end
+          end
+          if s5.last
+            r5 = instantiate_node(SyntaxNode,input, i5...index, s5)
+            r5.extend(SelectorsGroup0)
+          else
+            @index = i5
+            r5 = nil
+          end
+          if r5
+            s4 << r5
+          else
+            break
+          end
         end
-        s3 << r4
+        r4 = instantiate_node(SyntaxNode,input, i4...index, s4)
+        s0 << r4
         if r4
-          r5 = _nt_selector
-          s3 << r5
-        end
-        if s3.last
-          r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
-          r3.extend(SelectorsGroup0)
-        else
-          @index = i3
-          r3 = nil
-        end
-        if r3
-          s2 << r3
-        else
-          break
+          s12, i12 = [], index
+          loop do
+            r13 = _nt_ws
+            if r13
+              s12 << r13
+            else
+              break
+            end
+          end
+          r12 = instantiate_node(SyntaxNode,input, i12...index, s12)
+          s0 << r12
         end
       end
-      r2 = instantiate_node(SyntaxNode,input, i2...index, s2)
-      s0 << r2
     end
     if s0.last
       r0 = instantiate_node(JSONSelect::Ast::SelectorGroup,input, i0...index, s0)
@@ -156,6 +209,9 @@ module JSONSelect::Selector
     r0
   end
 
+  module Combinator0
+  end
+
   def _nt_combinator
     start_index = index
     if node_cache[:combinator].has_key?(index)
@@ -168,38 +224,68 @@ module JSONSelect::Selector
     end
 
     i0 = index
-    if has_terminal?('>', false, index)
-      r1 = instantiate_node(SyntaxNode,input, index...(index + 1))
-      @index += 1
+    i1, s1 = index, []
+    s2, i2 = [], index
+    loop do
+      r3 = _nt_ws
+      if r3
+        s2 << r3
+      else
+        break
+      end
+    end
+    r2 = instantiate_node(SyntaxNode,input, i2...index, s2)
+    s1 << r2
+    if r2
+      if has_terminal?('>', false, index)
+        r4 = instantiate_node(SyntaxNode,input, index...(index + 1))
+        @index += 1
+      else
+        terminal_parse_failure('>')
+        r4 = nil
+      end
+      s1 << r4
+      if r4
+        s5, i5 = [], index
+        loop do
+          r6 = _nt_ws
+          if r6
+            s5 << r6
+          else
+            break
+          end
+        end
+        r5 = instantiate_node(SyntaxNode,input, i5...index, s5)
+        s1 << r5
+      end
+    end
+    if s1.last
+      r1 = instantiate_node(SyntaxNode,input, i1...index, s1)
+      r1.extend(Combinator0)
     else
-      terminal_parse_failure('>')
+      @index = i1
       r1 = nil
     end
     if r1
       r0 = r1
     else
-      s2, i2 = [], index
+      s7, i7 = [], index
       loop do
-        if has_terminal?('\G[\\s]', true, index)
-          r3 = true
-          @index += 1
-        else
-          r3 = nil
-        end
-        if r3
-          s2 << r3
+        r8 = _nt_ws
+        if r8
+          s7 << r8
         else
           break
         end
       end
-      if s2.empty?
-        @index = i2
-        r2 = nil
+      if s7.empty?
+        @index = i7
+        r7 = nil
       else
-        r2 = instantiate_node(SyntaxNode,input, i2...index, s2)
+        r7 = instantiate_node(SyntaxNode,input, i7...index, s7)
       end
-      if r2
-        r0 = r2
+      if r7
+        r0 = r7
       else
         @index = i0
         r0 = nil
@@ -1237,6 +1323,29 @@ module JSONSelect::Selector
     end
 
     node_cache[:nonascii][start_index] = r0
+
+    r0
+  end
+
+  def _nt_ws
+    start_index = index
+    if node_cache[:ws].has_key?(index)
+      cached = node_cache[:ws][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    if has_terminal?('\G[ \\t\\r\\n]', true, index)
+      r0 = instantiate_node(SyntaxNode,input, index...(index + 1))
+      @index += 1
+    else
+      r0 = nil
+    end
+
+    node_cache[:ws][start_index] = r0
 
     r0
   end

@@ -25,7 +25,7 @@ class JSONSelect
         parser = JSONSelect::SelectorParser.new
         tree   = parser.parse(src)
         unless tree
-          raise JSONSelect::ParseError, @parser.failure_reason
+          raise JSONSelect::ParseError, parser.failure_reason
         end
 
         @ast = tree.to_ast

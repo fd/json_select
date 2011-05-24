@@ -20,10 +20,10 @@ describe "JSONSelect", "conformance" do
         describe "(#{name})" do
 
           it "parses the selector" do
-            ast = Yajl::Parser.parse(File.read(ast), :symbolize_keys => true)
+            ast = Yajl::Parser.parse(File.read(ast))
             s = JSONSelect(File.read(selector).strip)
             s.should be_a(JSONSelect)
-            s.ast.should == ast
+            Yajl::Parser.parse(Yajl::Encoder.encode(s.ast)).should == ast
           end
 
           it "produces the correct output" do
