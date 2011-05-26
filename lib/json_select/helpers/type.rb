@@ -8,6 +8,10 @@ private
 
   def type_of(object)
     if object.respond_to?(:json_select_each)
+      return 'array'
+    end
+    
+    if object.respond_to?(:json_select_each_pair)
       return 'object'
     end
     

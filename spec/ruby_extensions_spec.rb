@@ -12,9 +12,9 @@ describe "JSONSelect", "Ruby extensions" do
       should == :hello
   end
   
-  it "treats Objects which respond to #json_select_each as Objects" do
+  it "treats Objects which respond to #json_select_each_pair as Objects" do
     class Person < Struct.new(:name, :age)
-      def json_select_each
+      def json_select_each_pair
         yield(:name, self.name)
         yield(:age, self.age)
       end
@@ -23,6 +23,22 @@ describe "JSONSelect", "Ruby extensions" do
     JSONSelect('object.person string.name').
       match(:person => Person.new('Simon Menke', 24)).
       should == 'Simon Menke'
+  end
+  
+  it "treats Objects which respond to #json_select_each as Arrays" do
+    class List
+      def initialize(items)
+        @items = items
+      end
+      
+      def json_select_each
+        @items.each { |i| yield(i) }
+      end
+    end
+    
+    JSONSelect('array.person string:first-child').
+      match(:person => List.new(%w( foo bar baz ))).
+      should == 'foo'
   end
   
 end

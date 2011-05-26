@@ -144,27 +144,33 @@ private
 
       when Hash
         a1.unshift(',')
-        size = object.size
 
-        object.each_with_index do |(key, child), idx|
-          _each(a1, child, key, idx, size, depth + 1, &block)
+        object.each do |key, child|
+          _each(a1, child, key, nil, nil, depth + 1, &block)
         end
 
       else
         if object.respond_to?(:json_select_each)
           children = []
-          object.json_select_each do |key, value|
-            children << [key, value]
+          object.json_select_each do |value|
+            children << value
           end
           
           a1.unshift(',')
           size = children.size
           
-          children.each_with_index do |(key, child), idx|
-            _each(a1, child, key, idx, size, depth + 1, &block)
+          children.each_with_index do |child, idx|
+            _each(a1, child, nil, idx, size, depth + 1, &block)
           end
+          
+        elsif object.respond_to?(:json_select_each_pair)
+          a1.unshift(',')
+          
+          object.json_select_each_pair do |key, child|
+            _each(a1, child, key, nil, nil, depth + 1, &block)
+          end
+          
         end
-
       end
     end
 

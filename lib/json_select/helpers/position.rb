@@ -1,7 +1,7 @@
 module JSONSelect::PositionHelpers
   
   def nth_child(object, test, key, idx, size, depth)
-    return false unless idx
+    return false unless idx and size
     
     idx += 1
     
@@ -16,6 +16,8 @@ module JSONSelect::PositionHelpers
   end
   
   def nth_last_child(object, test, key, idx, size, depth)
+    return false unless idx and size
+    
     nth_child(object, test, key, (size - idx) - 1, size, depth)
   end
   
