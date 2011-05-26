@@ -5,6 +5,12 @@ class JSONSelect
   require 'json_select/version'
   require 'json_select/selector_parser'
   require 'json_select/selector'
+  
+  require 'json_select/helpers/size'
+  require 'json_select/helpers/key'
+  require 'json_select/helpers/type'
+  require 'json_select/helpers/depth'
+  require 'json_select/helpers/position'
 
   module Ast
     require 'json_select/ast/combination_selector'

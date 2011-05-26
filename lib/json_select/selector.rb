@@ -42,6 +42,19 @@ class JSONSelect
       raise ArgumentError, "Expected a string for ast"
 
     end
+    
+    @helpers = Module.new
+    @helpers.send(:extend,
+      JSONSelect::KeyHelpers,
+      JSONSelect::TypeHelpers,
+      JSONSelect::SizeHelpers,
+      JSONSelect::DepthHelpers,
+      JSONSelect::PositionHelpers)
+    
+    @helper_methods = {}
+    (@helpers.public_methods - Module.public_methods).map do |name|
+      @helper_methods[name.to_sym] = @helpers.method(name)
+    end
   end
 
   # Returns the first matching child in `object`
@@ -200,7 +213,7 @@ private
       end
       
       if match
-        match = !!send(test[:f], object, test, id, number, total, depth)
+        match = !!@helper_methods[test[:f].to_sym].call(object, test, id, number, total, depth)
       end
     end
 
@@ -233,72 +246,6 @@ private
     end
 
     return [match, selectors]
-  end
-
-  def type_of(object)
-    if object.respond_to?(:json_select_each)
-      return 'object'
-    end
-    
-    case object
-    when Hash       then 'object'
-    when Array      then 'array'
-    when String     then 'string'
-    when Symbol     then 'string'
-    when Numeric    then 'number'
-    when TrueClass  then 'boolean'
-    when FalseClass then 'boolean'
-    when NilClass   then 'null'
-    else raise "Invalid object of class #{object.class} for JSONSelect: #{object.inspect}"
-    end
-  end
-  
-  def only_child(object, test, key, idx, size, depth)
-    size == 1
-  end
-  
-  def empty(object, test, key, idx, size, depth)
-    case object
-    when Array then return object.empty?
-    when Hash  then return object.empty?
-    else
-      if object.respond_to?(:json_select_each)
-        object.json_select_each { return false }
-        return true
-      end
-    end
-    return false
-  end
-  
-  def is_root(object, test, key, idx, size, depth)
-    depth == 0
-  end
-  
-  def instance_of_type(object, test, key, idx, size, depth)
-    test[:n] == type_of(object)
-  end
-  
-  def has_class(object, test, key, idx, size, depth)
-    test[:n] == key.to_s
-  end
-  
-  def nth_child(object, test, key, idx, size, depth)
-    return false unless idx
-    
-    idx += 1
-    
-    a = test[:a]
-    b = test[:b]
-    
-    if a == 0
-      (b == idx)
-    else
-      (((idx - b) % a) == 0) and ((idx * a + b) >= 0)
-    end
-  end
-  
-  def nth_last_child(object, test, key, idx, size, depth)
-    nth_child(object, test, key, (size - idx) - 1, size, depth)
   end
 
 end
