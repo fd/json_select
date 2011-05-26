@@ -1,4 +1,4 @@
-# JSONSelect
+# JSONSelect [![Build Status](http://travis-ci.org/fd/json_select.png)](http://travis-ci.org/fd/json_select)
 
 **CSS-like selectors for JSON.**
 
