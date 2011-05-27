@@ -48,7 +48,9 @@ json = { # This would normally be loaded with something like yajl-ruby
   "weight" => 172
 }
 
-JSONSelect('string:first-child').match(json) # => ["Lloyd", "Bulgarian", "English", "Spanish", "window", "beer"]
+JSONSelect('string:first-child').test(json)    # => true
+JSONSelect('string:first-child').match(json)   # => "window"
+JSONSelect('string:first-child').matches(json) # => ["window", "beer"]
 ```
 
 ## Note on Patches/Pull Requests

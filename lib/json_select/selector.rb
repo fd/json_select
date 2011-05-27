@@ -92,32 +92,6 @@ class JSONSelect
 
 private
 
-  # function forEach(sel, obj, fun, id, num, tot) {
-  #   var a = (sel[0] === ',') ? sel.slice(1) : [sel];
-  #   var a0 = [];
-  #   var call = false;
-  #   for (var i = 0; i < a.length; i++) {
-  #     var x = mn(obj, a[i], id, num, tot);
-  #     if (x[0]) call = true;
-  #     for (var j = 0; j < x[1].length; j++) a0.push(x[1][j]);
-  #   }
-  #   if (a0.length && typeof obj === 'object') {
-  #     if (a0.length >= 1) a0.unshift(",");
-  #     if (isArray(obj)) {
-  #       for (var i = 0; i < obj.length; i++) forEach(a0, obj[i], fun, undefined, i, obj.length);
-  #     } else {
-  #       // it's a shame to do this for :last-child and other
-  #       // properties which count from the end when we don't
-  #       // even know if they're present.  Also, the stream
-  #       // parser is going to be pissed.
-  #       var l = 0;
-  #       for (var k in obj) if (obj.hasOwnProperty(k)) l++;
-  #       var i = 0;
-  #       for (var k in obj) if (obj.hasOwnProperty(k)) forEach(a0, obj[k], fun, k, i++, l);
-  #     }
-  #   }
-  #   if (call && fun) fun(obj);
-  # };
   def _each(selector, object, id, number, total, depth, &block)
     a0 = (selector[0] == ',' ? selector[1..-1] : [selector])
     a1 = []
@@ -179,34 +153,6 @@ private
     end
   end
 
-
-  # function mn(node, sel, id, num, tot) {
-  #   var sels = [];
-  #   var cs = (sel[0] === '>') ? sel[1] : sel[0];
-  #   var m = true;
-  #   if (cs.type) m = m && (cs.type === mytypeof(node));
-  #   if (cs.id)   m = m && (cs.id === id);
-  #   if (m && cs.pf) {
-  #     if (cs.pf === ":nth-last-child") num = tot - num;
-  #     else num++;
-  #     if (cs.a === 0) {
-  #       m = cs.b === num;
-  #     } else {
-  #       m = (!((num - cs.b) % cs.a) && ((num*cs.a + cs.b) >= 0));
-  #     }
-  #   }
-  #
-  #   // should we repeat this selector for descendants?
-  #   if (sel[0] !== '>' && sel[0].pc !== ":root") sels.push(sel);
-  #
-  #   if (m) {
-  #     // is there a fragment that we should pass down?
-  #     if (sel[0] === '>') { if (sel.length > 2) { m = false; sels.push(sel.slice(2)); } }
-  #     else if (sel.length > 1) { m = false; sels.push(sel.slice(1)); }
-  #   }
-  #
-  #   return [m, sels];
-  # }
   def _match(object, selector, id, number, total, depth)
     selectors = []
     current_selector = (selector[0] == :> ? selector[1] : selector[0])
