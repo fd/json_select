@@ -16,6 +16,7 @@ describe "JSONSelect", "conformance" do
         name     = basename[(test.size + 1)..-1]
         output   = File.expand_path("../fixtures/#{basename}.output", __FILE__)
         ast      = File.expand_path("../fixtures/#{basename}.ast", __FILE__)
+        selector_o = File.expand_path("../fixtures/#{basename}.selector.out", __FILE__)
 
         describe "(#{name})" do
 
@@ -31,6 +32,12 @@ describe "JSONSelect", "conformance" do
             e = []
             Yajl::Parser.parse(File.read(output)) { |o| e << o }
             s.matches(input).should == e
+          end
+
+          it "produces the correct selector" do
+            s = JSONSelect(File.read(selector).strip)
+            e = File.read(selector_o)
+            s.to_s.should == e
           end
 
           it "finds the first matching child" do

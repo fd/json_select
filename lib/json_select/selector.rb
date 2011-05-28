@@ -42,7 +42,7 @@ class JSONSelect
       raise ArgumentError, "Expected a string for ast"
 
     end
-    
+
     @helpers = Module.new
     @helpers.send(:extend,
       JSONSelect::KeyHelpers,
@@ -50,7 +50,7 @@ class JSONSelect
       JSONSelect::SizeHelpers,
       JSONSelect::DepthHelpers,
       JSONSelect::PositionHelpers)
-    
+
     @helper_methods = {}
     (@helpers.public_methods - Module.public_methods).map do |name|
       @helper_methods[name.to_sym] = @helpers.method(name)
@@ -89,6 +89,38 @@ class JSONSelect
   end
 
   alias_method :===, :test
+
+  def to_s
+    selectors = @ast
+    selectors = (selectors[0] == ',' ? selectors[1..-1] : [selectors])
+
+    selectors.map do |selector|
+      selector.map do |part|
+        case part
+
+        when :>
+          '>'
+
+        when Hash
+          tests = (part[:tests].empty? ? ['*'] : part[:tests])
+
+          tests.map do |test|
+            case test
+
+            when '*'
+              '*'
+
+            when Hash
+              @helpers.send("format_#{test[:f]}", test)
+
+            end
+          end.join('')
+
+        end
+
+      end.join(' ')
+    end.join(', ')
+  end
 
 private
 
@@ -129,21 +161,21 @@ private
           object.json_select_each do |value|
             children << value
           end
-          
+
           a1.unshift(',')
           size = children.size
-          
+
           children.each_with_index do |child, idx|
             _each(a1, child, nil, idx, size, depth + 1, &block)
           end
-          
+
         elsif object.respond_to?(:json_select_each_pair)
           a1.unshift(',')
-          
+
           object.json_select_each_pair do |key, child|
             _each(a1, child, key, nil, nil, depth + 1, &block)
           end
-          
+
         end
       end
     end
@@ -163,7 +195,7 @@ private
       if test[:f] == :is_root
         has_root_test = true
       end
-      
+
       if match
         match = !!@helper_methods[test[:f].to_sym].call(object, test, id, number, total, depth)
       end
@@ -183,16 +215,16 @@ private
     unless match
       return [match, selectors]
     end
-    
+
     # continue search for decendants
     unless selector[0] == :>
       match = false
       selectors.push selector[1..-1]
       return [match, selectors]
     end
-    
+
     # continue search for children
-    if selector.length > 2 
+    if selector.length > 2
       match = false
       selectors.push selector[2..-1]
     end
