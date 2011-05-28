@@ -122,6 +122,10 @@ class JSONSelect
     end.join(', ')
   end
 
+  def inspect
+    "#<JSONSelect (#{to_s})>"
+  end
+
 private
 
   def _each(selector, object, id, number, total, depth, &block)
