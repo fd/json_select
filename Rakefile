@@ -9,6 +9,11 @@ RSpec::Core::RakeTask.new do |t|
     '-r', File.expand_path("../spec/spec_helper.rb", __FILE__)]
 end
 
+task :checkout_conformance_tests do
+  sh "git submodule init"
+  sh "git submodule update"
+end
+
 task :build_parser do
   sh "bundle exec tt lib/json_select/selector_parser.tt -o lib/json_select/selector_parser.rb"
 
@@ -18,6 +23,6 @@ task :build_parser do
   File.open(path, 'w+') { |f| f.write src }
 end
 
-task :spec    => :build_parser
+task :spec    => [:checkout_conformance_tests, :build_parser]
 task :build   => :build_parser
 task :default => :spec
