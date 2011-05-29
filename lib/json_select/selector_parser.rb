@@ -619,7 +619,18 @@ module JSONSelect::Selector
     end
 
     def e
-      elements[4]
+      elements[5]
+    end
+
+  end
+
+  module Pseudo2
+    def a
+      elements[1]
+    end
+
+    def s
+      elements[5]
     end
 
   end
@@ -669,53 +680,66 @@ module JSONSelect::Selector
       end
       s4 << r5
       if r5
-        r6 = _nt_pseudo_function_name
+        r6 = _nt_positional_pseudo_function_name
         s4 << r6
         if r6
-          if has_terminal?('(', false, index)
-            r7 = instantiate_node(SyntaxNode,input, index...(index + 1))
-            @index += 1
-          else
-            terminal_parse_failure('(')
-            r7 = nil
+          s7, i7 = [], index
+          loop do
+            r8 = _nt_ws
+            if r8
+              s7 << r8
+            else
+              break
+            end
           end
+          r7 = instantiate_node(SyntaxNode,input, i7...index, s7)
           s4 << r7
           if r7
-            s8, i8 = [], index
-            loop do
-              r9 = _nt_ws
-              if r9
-                s8 << r9
-              else
-                break
-              end
+            if has_terminal?('(', false, index)
+              r9 = instantiate_node(SyntaxNode,input, index...(index + 1))
+              @index += 1
+            else
+              terminal_parse_failure('(')
+              r9 = nil
             end
-            r8 = instantiate_node(SyntaxNode,input, i8...index, s8)
-            s4 << r8
-            if r8
-              r10 = _nt_expression
+            s4 << r9
+            if r9
+              s10, i10 = [], index
+              loop do
+                r11 = _nt_ws
+                if r11
+                  s10 << r11
+                else
+                  break
+                end
+              end
+              r10 = instantiate_node(SyntaxNode,input, i10...index, s10)
               s4 << r10
               if r10
-                s11, i11 = [], index
-                loop do
-                  r12 = _nt_ws
-                  if r12
-                    s11 << r12
-                  else
-                    break
+                r12 = _nt_expression
+                s4 << r12
+                if r12
+                  s13, i13 = [], index
+                  loop do
+                    r14 = _nt_ws
+                    if r14
+                      s13 << r14
+                    else
+                      break
+                    end
                   end
-                end
-                r11 = instantiate_node(SyntaxNode,input, i11...index, s11)
-                s4 << r11
-                if r11
-                  if has_terminal?(')', false, index)
-                    r13 = instantiate_node(SyntaxNode,input, index...(index + 1))
-                    @index += 1
-                  else
-                    terminal_parse_failure(')')
-                    r13 = nil
-                  end
+                  r13 = instantiate_node(SyntaxNode,input, i13...index, s13)
                   s4 << r13
+                  if r13
+                    if has_terminal?(')', false, index)
+                      r15 = instantiate_node(SyntaxNode,input, index...(index + 1))
+                      @index += 1
+                    else
+                      terminal_parse_failure(')')
+                      r15 = nil
+                    end
+                    s4 << r15
+                  end
                 end
               end
             end
@@ -732,8 +756,95 @@ module JSONSelect::Selector
       if r4
         r0 = r4
       else
-        @index = i0
-        r0 = nil
+        i16, s16 = index, []
+        if has_terminal?(':', false, index)
+          r17 = instantiate_node(SyntaxNode,input, index...(index + 1))
+          @index += 1
+        else
+          terminal_parse_failure(':')
+          r17 = nil
+        end
+        s16 << r17
+        if r17
+          r18 = _nt_subselector_pseudo_function_name
+          s16 << r18
+          if r18
+            s19, i19 = [], index
+            loop do
+              r20 = _nt_ws
+              if r20
+                s19 << r20
+              else
+                break
+              end
+            end
+            r19 = instantiate_node(SyntaxNode,input, i19...index, s19)
+            s16 << r19
+            if r19
+              if has_terminal?('(', false, index)
+                r21 = instantiate_node(SyntaxNode,input, index...(index + 1))
+                @index += 1
+              else
+                terminal_parse_failure('(')
+                r21 = nil
+              end
+              s16 << r21
+              if r21
+                s22, i22 = [], index
+                loop do
+                  r23 = _nt_ws
+                  if r23
+                    s22 << r23
+                  else
+                    break
+                  end
+                end
+                r22 = instantiate_node(SyntaxNode,input, i22...index, s22)
+                s16 << r22
+                if r22
+                  r24 = _nt_selectors_group
+                  s16 << r24
+                  if r24
+                    s25, i25 = [], index
+                    loop do
+                      r26 = _nt_ws
+                      if r26
+                        s25 << r26
+                      else
+                        break
+                      end
+                    end
+                    r25 = instantiate_node(SyntaxNode,input, i25...index, s25)
+                    s16 << r25
+                    if r25
+                      if has_terminal?(')', false, index)
+                        r27 = instantiate_node(SyntaxNode,input, index...(index + 1))
+                        @index += 1
+                      else
+                        terminal_parse_failure(')')
+                        r27 = nil
+                      end
+                      s16 << r27
+                    end
+                  end
+                end
+              end
+            end
+          end
+        end
+        if s16.last
+          r16 = instantiate_node(JSONSelect::Ast::PseudoSelector,input, i16...index, s16)
+          r16.extend(Pseudo2)
+        else
+          @index = i16
+          r16 = nil
+        end
+        if r16
+          r0 = r16
+        else
+          @index = i0
+          r0 = nil
+        end
       end
     end
 
@@ -817,10 +928,10 @@ module JSONSelect::Selector
     r0
   end
 
-  def _nt_pseudo_function_name
+  def _nt_positional_pseudo_function_name
     start_index = index
-    if node_cache[:pseudo_function_name].has_key?(index)
-      cached = node_cache[:pseudo_function_name][index]
+    if node_cache[:positional_pseudo_function_name].has_key?(index)
+      cached = node_cache[:positional_pseudo_function_name][index]
       if cached
         cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
@@ -854,7 +965,31 @@ module JSONSelect::Selector
       end
     end
 
-    node_cache[:pseudo_function_name][start_index] = r0
+    node_cache[:positional_pseudo_function_name][start_index] = r0
+
+    r0
+  end
+
+  def _nt_subselector_pseudo_function_name
+    start_index = index
+    if node_cache[:subselector_pseudo_function_name].has_key?(index)
+      cached = node_cache[:subselector_pseudo_function_name][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    if has_terminal?('has', false, index)
+      r0 = instantiate_node(SyntaxNode,input, index...(index + 3))
+      @index += 3
+    else
+      terminal_parse_failure('has')
+      r0 = nil
+    end
+
+    node_cache[:subselector_pseudo_function_name][start_index] = r0
 
     r0
   end

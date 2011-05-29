@@ -1,0 +1,3 @@
+[submodule "spec/fixtures/conformance"]
+	path = spec/fixtures/conformance
+	url = git://github.com/lloyd/JSONSelectTests.git

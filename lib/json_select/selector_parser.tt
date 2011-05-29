@@ -63,7 +63,8 @@ grammar JSONSelectSelector
   #   ;
   rule pseudo
     ( ':' a:pseudo_class_name <JSONSelect::Ast::PseudoSelector> ) /
-    ( ':' a:pseudo_function_name '(' ws* e:expression ws* ')' <JSONSelect::Ast::PseudoSelector> )
+    ( ':' a:positional_pseudo_function_name ws* '(' ws* e:expression ws* ')' <JSONSelect::Ast::PseudoSelector> ) /
+    ( ':' a:subselector_pseudo_function_name ws* '(' ws* s:selectors_group ws* ')' <JSONSelect::Ast::PseudoSelector> )
   end
 
   # pseudo_class_name
@@ -74,8 +75,14 @@ grammar JSONSelectSelector
 
   # pseudo_function_name
   #   : `nth-child` | `nth-last-child`
-  rule pseudo_function_name
+  rule positional_pseudo_function_name
     'nth-child' / 'nth-last-child'
+  end
+
+  # pseudo_function_name
+  #   : `nth-child` | `nth-last-child`
+  rule subselector_pseudo_function_name
+    'has'
   end
 
   # expression
