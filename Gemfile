@@ -6,3 +6,4 @@ gemspec
 gem 'rake', '0.8.7'
 gem 'rspec'
 gem 'yajl-ruby'
+gem 'rubygems-openpgp'

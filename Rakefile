@@ -23,6 +23,12 @@ task :build_parser do
   File.open(path, 'w+') { |f| f.write src }
 end
 
+task :build do
+  h = Bundler::GemHelper.instance
+  path = Dir[File.join(h.base, "pkg", "#{h.gemspec.name}-*.gem")].sort_by{|f| File.mtime(f)}.last
+  sh "gem sign #{path}"
+end
+
 task :spec    => [:checkout_conformance_tests, :build_parser]
 task :build   => :build_parser
 task :default => :spec
